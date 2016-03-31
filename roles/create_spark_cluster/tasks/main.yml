@@ -76,6 +76,7 @@
 - name: get the ubuntu trusty AMI
   ec2_ami_search: distro=ubuntu release=trusty virt=hvm region={{ region }}
   register: ubuntu_image
+  tags: always
 
 - name: start the spark master
   ec2:
@@ -90,6 +91,7 @@
     count_tag: { ds_role: spark_master }
     wait: yes
   register: spark_master
+  tags: always
 
 - name: start the spark slaves
   ec2:
@@ -104,13 +106,16 @@
     count_tag: { ds_role: spark_slave }
     wait: yes
   register: spark_slave
+  tags: always
 
 - name: wait for ssh server to be running
   wait_for: host={{ item.public_dns_name }} port=22 search_regex=OpenSSH
   when: item.public_dns_name is defined
   with_items: "{{ spark_master.tagged_instances }}"
+  tags: always
 
 - name: wait for ssh server to be running
   wait_for: host={{ item.public_dns_name }} port=22 search_regex=OpenSSH
   when: item.public_dns_name is defined
   with_items: "{{ spark_slave.tagged_instances }}"
+  tags: always

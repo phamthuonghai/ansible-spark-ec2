@@ -1,7 +1,7 @@
 - name: Create instances on Amazon EC2
   hosts: localhost
   roles:
-  - {role: create_spark_cluster, tags: ['create', 'cluster', 'spark', 'spark_master', 'run']}
+  - create_spark_cluster
 
 
 - name: Install spark
@@ -13,5 +13,5 @@
 - name: Config spark master
   hosts: tag_ds_role_spark_master
   roles:
-  - {role: common_standalone, tags: ['spark', 'spark_master', 'install']}
-  - {role: spark_master, tags: ['spark', 'spark_master', 'run']}
+  - common_standalone
+  - spark_master

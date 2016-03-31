@@ -21,22 +21,27 @@
 - name: write SPARK_PUBLIC_DNS on master
   local_action: shell echo 'export SPARK_PUBLIC_DNS="{{ item.public_dns_name }}"' | ssh ubuntu@{{ item.public_ip }} "sudo su -c 'cat >> {{ spark_root }}/conf/spark-env.sh'"
   with_items: "{{ hostvars.localhost.spark_master.tagged_instances }}"
+  tags: config_spark
 
 - name: write SPARK_PUBLIC_DNS on slaves
   local_action: shell echo 'export SPARK_PUBLIC_DNS="{{ item.public_dns_name }}"' | ssh ubuntu@{{ item.public_ip }} "sudo su -c 'cat >> {{ spark_root }}/conf/spark-env.sh'"
   with_items: "{{ hostvars.localhost.spark_slave.tagged_instances }}"
+  tags: config_spark
 
 - name: populate conf/slaves file
   sudo: yes
   template: src=conf/slaves.j2 dest={{ spark_root }}/conf/slaves
+  tags: config_spark
 
 - name: attempt to stop Spark workers
   sudo: yes
   shell: "{{ spark_root }}/sbin/stop-all.sh"
+  tags: run
 
 - name: attempt to start Spark cluster
   sudo: yes
   shell: "{{ spark_root }}/sbin/start-all.sh"
+  tags: run
 
 - name: create Jupyter directories
   file: path={{ item }} state=directory mode=0755
@@ -52,9 +57,11 @@
   template:
     src: jupyter-service.conf
     dest: /etc/init/jupyter-service.conf
+  tags: run
 
 - name: Start Jupyter-service
   sudo: yes
   service:
     name: jupyter-service
     state: restarted
+  tags: run

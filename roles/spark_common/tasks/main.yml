@@ -25,3 +25,4 @@
 - name: configure Spark to run in standalone deploy mode
   sudo: yes
   template: src=conf/spark-env.sh.j2 dest={{ spark_root }}/conf/spark-env.sh mode="u=rwx,g=rx,o=rx"
+  tags: config_spark
