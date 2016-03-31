@@ -3,23 +3,22 @@
 
 - name: modify host file add master node
   sudo: yes
-  lineinfile: dest=/etc/hosts line="{{ item.private_ip }}  spark_master"
-  with_items: "{{ hostvars.localhost.spark_master.tagged_instances }}"
+  lineinfile: dest=/etc/hosts line="{{ hostvars.localhost.spark_master.tagged_instances[0].public_ip }}  spark_master"
 
 - name: modify host file add slave node
   sudo: yes
-  lineinfile: dest=/etc/hosts line="{{ item[1].private_ip }}  spark_slave_{{ item[0] }}"
+  lineinfile: dest=/etc/hosts line="{{ item[1].public_ip }}  spark_slave_{{ item[0] }}"
   with_indexed_items: "{{ hostvars.localhost.spark_slave.tagged_instances }}"
 
-- name: Download Spark pre-built package
+- name: download Spark pre-built package
   sudo: yes
   get_url: url={{ spark_download_url }} dest="/tmp/spark-{{ spark_version }}.tgz"
 
-- name: Extract Spark archive
+- name: extract Spark archive
   sudo: yes
   unarchive: copy=no src="/tmp/spark-{{ spark_version }}.tgz" dest=/opt/
 
-- name: Create link to Spark directory
+- name: create link to Spark directory
   sudo: yes
   file: src=/opt/spark-{{ spark_version }} dest={{ spark_root }} state=link
 

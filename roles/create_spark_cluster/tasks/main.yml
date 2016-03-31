@@ -52,8 +52,10 @@
         to_port: 8081
         cidr_ip: 0.0.0.0/0
       - proto: tcp
-        from_port: "{{ spark_worker_port }}"
-        to_port: "{{ spark_worker_port_end }}"
+        # from_port: "{{ spark_worker_port }}"
+        # to_port: "{{ spark_worker_port_end }}"
+        from_port: 30000
+        to_port: 65535
         cidr_ip: 0.0.0.0/0
       - proto: udp
         from_port: 1

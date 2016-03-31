@@ -6,5 +6,6 @@ boto_profile: DSPlatform
 
 spark_download_url: http://d3kbcqa49mib13.cloudfront.net/spark-1.5.2-bin-hadoop2.6.tgz
 spark_version: 1.5.2-bin-hadoop2.6
-spark_worker_port: 37700
-spark_worker_port_end: 37800
+remote_user: ubuntu
+# spark_worker_port: 37700
+# spark_worker_port_end: 37800

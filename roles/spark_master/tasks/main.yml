@@ -8,12 +8,23 @@
   sudo: yes
   fetch: src=/root/.ssh/id_rsa.pub dest=/tmp/id_rsa.tmp flat=yes
 
-- name: copying local key to other.server.net
+- name: authorize master key on slaves
   local_action: shell cat /tmp/id_rsa.tmp | ssh ubuntu@{{ item.public_ip }} "sudo su -c 'cat >> /root/.ssh/authorized_keys'"
   with_items: "{{ hostvars.localhost.spark_slave.tagged_instances }}"
 
+- name: authorize master key on itself
+  local_action: shell cat /tmp/id_rsa.tmp | ssh ubuntu@{{ hostvars.localhost.spark_master.tagged_instances[0].public_ip }} "sudo su -c 'cat >> /root/.ssh/authorized_keys'"
+
 - name: delete temporary file
   local_action: file  path=/tmp/id_rsa.tmp state=absent
+
+- name: write SPARK_PUBLIC_DNS on master
+  local_action: shell echo 'export SPARK_PUBLIC_DNS="{{ item.public_dns_name }}"' | ssh ubuntu@{{ item.public_ip }} "sudo su -c 'cat >> {{ spark_root }}/conf/spark-env.sh'"
+  with_items: "{{ hostvars.localhost.spark_master.tagged_instances }}"
+
+- name: write SPARK_PUBLIC_DNS on slaves
+  local_action: shell echo 'export SPARK_PUBLIC_DNS="{{ item.public_dns_name }}"' | ssh ubuntu@{{ item.public_ip }} "sudo su -c 'cat >> {{ spark_root }}/conf/spark-env.sh'"
+  with_items: "{{ hostvars.localhost.spark_slave.tagged_instances }}"
 
 - name: populate conf/slaves file
   sudo: yes
@@ -27,15 +38,23 @@
   sudo: yes
   shell: "{{ spark_root }}/sbin/start-all.sh"
 
-- name: create Jupyter config directory
-  file: path=~/.jupyter state=directory mode=0755
+- name: create Jupyter directories
+  file: path={{ item }} state=directory mode=0755
+  with_items:
+    - "/home/{{ remote_user }}/.jupyter"
+    - "/home/{{ remote_user }}/notebooks"
 
 - name: copy Jupyter config file
   template: src=jupyter_notebook_config.py dest=~/.jupyter/jupyter_notebook_config.py
 
-- name: config Jupyter notebook with Spark
-  shell: 'export PYSPARK_PYTHON=python && export PYSPARK_DRIVER_PYTHON=ipython && export PYSPARK_DRIVER_PYTHON_OPTS="notebook"'
+- name: Add upstart job for Jupyter-service
+  sudo: yes
+  template:
+    src: jupyter-service.conf
+    dest: /etc/init/jupyter-service.conf
 
-- name: attempt to start Jupyter notebook with Spark
-  shell: "nohup {{ spark_root }}/bin/pyspark --master spark://{{ item.private_ip }}:7077 2>&1 notebook.log &"
-  with_items: "{{ hostvars.localhost.spark_master.tagged_instances }}"
+- name: Start Jupyter-service
+  sudo: yes
+  service:
+    name: jupyter-service
+    state: restarted
