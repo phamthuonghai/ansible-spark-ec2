@@ -3,11 +3,11 @@
 
 - name: modify host file add master node
   sudo: yes
-  lineinfile: dest=/etc/hosts line="{{ hostvars.localhost.spark_master.tagged_instances[0].public_ip }}  spark_master"
+  lineinfile: dest=/etc/hosts line="{{ hostvars.localhost.spark_master.tagged_instances[0].private_ip }}  spark_master"
 
 - name: modify host file add slave node
   sudo: yes
-  lineinfile: dest=/etc/hosts line="{{ item[1].public_ip }}  spark_slave_{{ item[0] }}"
+  lineinfile: dest=/etc/hosts line="{{ item[1].private_ip }}  spark_slave_{{ item[0] }}"
   with_indexed_items: "{{ hostvars.localhost.spark_slave.tagged_instances }}"
 
 - name: download Spark pre-built package
