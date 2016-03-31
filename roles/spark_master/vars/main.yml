@@ -1,0 +1,3 @@
+---
+# vars file for spark_master
+spark_root: /opt/spark-{{ spark_version }}

@@ -1,0 +1,5 @@
+---
+# handlers file for common
+- name: restart cron
+  sudo: yes
+  command: service cron restart

@@ -1,0 +1,114 @@
+---
+# tasks file for create_spark_cluster
+- name: web security group
+  ec2_group:
+    name: web
+    description: allow http and https access
+    region: "{{ region }}"
+    profile: "{{ boto_profile }}"
+    rules:
+      - proto: tcp
+        from_port: 80
+        to_port: 80
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 443
+        to_port: 443
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 8888
+        to_port: 8888
+        cidr_ip: 0.0.0.0/0
+
+- name: ssh security group
+  ec2_group:
+    name: ssh
+    description: allow ssh access
+    region: "{{ region }}"
+    profile: "{{ boto_profile }}"
+    rules:
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: 0.0.0.0/0
+
+- name: allow spark protocol
+  ec2_group:
+    name: spark
+    description: allow spark protocol
+    region: "{{ region }}"
+    profile: "{{ boto_profile }}"
+    rules:
+      - proto: tcp
+        from_port: 6066
+        to_port: 6066
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 7077
+        to_port: 7077
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 8080
+        to_port: 8081
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: "{{ spark_worker_port }}"
+        to_port: "{{ spark_worker_port_end }}"
+        cidr_ip: 0.0.0.0/0
+      - proto: udp
+        from_port: 1
+        to_port: 65535
+        cidr_ip: 0.0.0.0/0
+
+
+- name: outbound security group
+  ec2_group:
+    name: outbound
+    description: allow outbound connections to the internet
+    region: "{{ region }}"
+    profile: "{{ boto_profile }}"
+    rules_egress:
+      - proto: all
+        cidr_ip: 0.0.0.0/0
+
+- name: get the ubuntu trusty AMI
+  ec2_ami_search: distro=ubuntu release=trusty virt=hvm region={{ region }}
+  register: ubuntu_image
+
+- name: start the spark master
+  ec2:
+    image: "{{ ubuntu_image.ami }}"
+    region: "{{ region }}"
+    instance_type: "{{ instance_type }}"
+    profile: "{{ boto_profile }}"
+    key_name: dsteam
+    group: [web, ssh, outbound, spark]
+    instance_tags: { Name: spark_master, ds_tech: spark, ds_role: spark_master }
+    exact_count: 1
+    count_tag: { ds_role: spark_master }
+    wait: yes
+  register: spark_master
+
+- name: start the spark slaves
+  ec2:
+    image: "{{ ubuntu_image.ami }}"
+    region: "{{ region }}"
+    instance_type: "{{ instance_type }}"
+    profile: "{{ boto_profile }}"
+    key_name: dsteam
+    group: [web, ssh, outbound, spark]
+    instance_tags: { Name: spark_slave, ds_tech: spark, ds_role: spark_slave }
+    exact_count: "{{ slave_count }}"
+    count_tag: { ds_role: spark_slave }
+    wait: yes
+  register: spark_slave
+
+- name: wait for ssh server to be running
+  wait_for: host={{ item.public_dns_name }} port=22 search_regex=OpenSSH
+  when: item.public_dns_name is defined
+  with_items: "{{ spark_master.tagged_instances }}"
+
+- name: wait for ssh server to be running
+  wait_for: host={{ item.public_dns_name }} port=22 search_regex=OpenSSH
+  when: item.public_dns_name is defined
+  with_items: "{{ spark_slave.tagged_instances }}"

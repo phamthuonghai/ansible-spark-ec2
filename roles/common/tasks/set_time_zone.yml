@@ -1,0 +1,11 @@
+- name: set timezone to ICT
+  sudo: yes
+  copy:
+    content: "Asia/Ho_Chi_Minh\n"
+    dest: /etc/timezone
+  notify: restart cron
+
+- name: update tzdata
+  sudo: yes
+  command: "/usr/sbin/dpkg-reconfigure --frontend noninteractive tzdata"
+  changed_when: false

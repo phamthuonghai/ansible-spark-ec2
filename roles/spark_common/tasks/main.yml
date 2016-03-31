@@ -1,0 +1,28 @@
+---
+# tasks file for spark_common
+
+- name: modify host file add master node
+  sudo: yes
+  lineinfile: dest=/etc/hosts line="{{ item.private_ip }}  spark_master"
+  with_items: "{{ hostvars.localhost.spark_master.tagged_instances }}"
+
+- name: modify host file add slave node
+  sudo: yes
+  lineinfile: dest=/etc/hosts line="{{ item[1].private_ip }}  spark_slave_{{ item[0] }}"
+  with_indexed_items: "{{ hostvars.localhost.spark_slave.tagged_instances }}"
+
+- name: Download Spark pre-built package
+  sudo: yes
+  get_url: url={{ spark_download_url }} dest="/tmp/spark-{{ spark_version }}.tgz"
+
+- name: Extract Spark archive
+  sudo: yes
+  unarchive: copy=no src="/tmp/spark-{{ spark_version }}.tgz" dest=/opt/
+
+- name: Create link to Spark directory
+  sudo: yes
+  file: src=/opt/spark-{{ spark_version }} dest={{ spark_root }} state=link
+
+- name: configure Spark to run in standalone deploy mode
+  sudo: yes
+  template: src=conf/spark-env.sh.j2 dest={{ spark_root }}/conf/spark-env.sh mode="u=rwx,g=rx,o=rx"

@@ -1,0 +1,41 @@
+---
+# tasks file for spark_master
+- name: generate RSA key for root
+  sudo: yes
+  user: name=root generate_ssh_key=yes
+
+- name: download pub key
+  sudo: yes
+  fetch: src=/root/.ssh/id_rsa.pub dest=/tmp/id_rsa.tmp flat=yes
+
+- name: copying local key to other.server.net
+  local_action: shell cat /tmp/id_rsa.tmp | ssh ubuntu@{{ item.public_ip }} "sudo su -c 'cat >> /root/.ssh/authorized_keys'"
+  with_items: "{{ hostvars.localhost.spark_slave.tagged_instances }}"
+
+- name: delete temporary file
+  local_action: file  path=/tmp/id_rsa.tmp state=absent
+
+- name: populate conf/slaves file
+  sudo: yes
+  template: src=conf/slaves.j2 dest={{ spark_root }}/conf/slaves
+
+- name: attempt to stop Spark workers
+  sudo: yes
+  shell: "{{ spark_root }}/sbin/stop-all.sh"
+
+- name: attempt to start Spark cluster
+  sudo: yes
+  shell: "{{ spark_root }}/sbin/start-all.sh"
+
+- name: create Jupyter config directory
+  file: path=~/.jupyter state=directory mode=0755
+
+- name: copy Jupyter config file
+  template: src=jupyter_notebook_config.py dest=~/.jupyter/jupyter_notebook_config.py
+
+- name: config Jupyter notebook with Spark
+  shell: 'export PYSPARK_PYTHON=python && export PYSPARK_DRIVER_PYTHON=ipython && export PYSPARK_DRIVER_PYTHON_OPTS="notebook"'
+
+- name: attempt to start Jupyter notebook with Spark
+  shell: "nohup {{ spark_root }}/bin/pyspark --master spark://{{ item.private_ip }}:7077 2>&1 notebook.log &"
+  with_items: "{{ hostvars.localhost.spark_master.tagged_instances }}"

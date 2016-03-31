@@ -1,0 +1,4 @@
+# Spark slaves list
+{% for host in hostvars.localhost.spark_slave.tagged_instances %}
+{{ host.public_ip }}
+{% endfor %}
