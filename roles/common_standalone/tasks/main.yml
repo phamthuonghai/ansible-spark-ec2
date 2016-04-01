@@ -1,17 +1,5 @@
 ---
 # tasks file for common_standalone
-- name: Install essentials
-  sudo: yes
-  apt: pkg={{ item }} state=installed force=yes
-  with_items:
-    - python-dev
-    - python-pip
-    - libblas-dev 
-    - liblapack-dev 
-    - libatlas-base-dev 
-    - gfortran
-    - build-essential
-
 - name: Install utilities
   sudo: yes
   apt: pkg={{ item }} state=installed force=yes
@@ -22,7 +10,4 @@
   sudo: yes
   pip: name={{ item }} state=latest
   with_items:
-    - numpy
-    - pandas
-    - numexpr
     - jupyter

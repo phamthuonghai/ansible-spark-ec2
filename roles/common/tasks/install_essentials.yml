@@ -1,0 +1,22 @@
+- name: Install essentials
+  sudo: yes
+  apt: pkg={{ item }} state=installed update_cache=yes
+  with_items:
+    - build-essential
+    - wget
+    - tar
+    - gzip
+    - python-dev
+    - python-pip
+    - libblas-dev 
+    - liblapack-dev 
+    - libatlas-base-dev 
+    - gfortran
+
+- name: Install pip packages
+  sudo: yes
+  pip: name={{ item }} state=latest
+  with_items:
+    - numpy
+    - pandas
+    - numexpr
