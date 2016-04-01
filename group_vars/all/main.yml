@@ -3,9 +3,14 @@ region: us-west-2
 instance_type: m4.large
 slave_count: 2
 boto_profile: DSPlatform
+remote_user: ubuntu
 
 spark_download_url: http://d3kbcqa49mib13.cloudfront.net/spark-1.5.2-bin-hadoop2.6.tgz
 spark_version: 1.5.2-bin-hadoop2.6
-remote_user: ubuntu
+spark_root: /opt/spark
 # spark_worker_port: 37700
 # spark_worker_port_end: 37800
+
+hadoop_download_url: http://www-us.apache.org/dist/hadoop/common/hadoop-2.6.4/hadoop-2.6.4.tar.gz
+hadoop_version: 2.6.4
+hadoop_root: /opt/hadoop

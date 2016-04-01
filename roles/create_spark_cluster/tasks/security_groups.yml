@@ -30,7 +30,7 @@
         to_port: 22
         cidr_ip: 0.0.0.0/0
 
-- name: allow spark protocol
+- name: spark security group
   ec2_group:
     name: spark
     description: allow spark protocol
@@ -56,13 +56,34 @@
       - proto: tcp
         # from_port: "{{ spark_worker_port }}"
         # to_port: "{{ spark_worker_port_end }}"
-        from_port: 30000
+        from_port: 1
         to_port: 65535
-        cidr_ip: 0.0.0.0/0
+        cidr_ip: 172.16.0.0/12
       - proto: udp
         from_port: 1
         to_port: 65535
+        cidr_ip: 172.16.0.0/12
+
+- name: hadoop security group
+  ec2_group:
+    name: hadoop
+    description: allow hadoop protocol
+    region: "{{ region }}"
+    profile: "{{ boto_profile }}"
+    rules:
+      - proto: tcp
+        from_port: 9000
+        to_port: 9001
         cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 50030
+        to_port: 50070
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 1
+        to_port: 65535
+        cidr_ip: 172.16.0.0/12
+  tags: hadoop
 
 - name: outbound security group
   ec2_group:

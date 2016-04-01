@@ -14,7 +14,7 @@
     instance_type: "{{ instance_type }}"
     profile: "{{ boto_profile }}"
     key_name: dsteam
-    group: [web, ssh, outbound, spark]
+    group: [web, ssh, outbound, spark, hadoop]
     instance_tags: { Name: spark_master, ds_tech: spark, ds_role: spark_master }
     exact_count: 1
     count_tag: { ds_role: spark_master }
@@ -29,7 +29,7 @@
     instance_type: "{{ instance_type }}"
     profile: "{{ boto_profile }}"
     key_name: dsteam
-    group: [web, ssh, outbound, spark]
+    group: [web, ssh, outbound, spark, hadoop]
     instance_tags: { Name: spark_slave, ds_tech: spark, ds_role: spark_slave }
     exact_count: "{{ slave_count }}"
     count_tag: { ds_role: spark_slave }

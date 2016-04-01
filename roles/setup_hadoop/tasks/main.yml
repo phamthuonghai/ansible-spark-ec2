@@ -1,0 +1,42 @@
+---
+# tasks file for setup_hadoop
+- name: download Hadoop pre-built package
+  sudo: yes
+  get_url: url={{ hadoop_download_url }} dest="/tmp/hadoop-{{ hadoop_version }}.tgz"
+
+- name: extract Hadoop archive
+  sudo: yes
+  unarchive: copy=no src="/tmp/hadoop-{{ hadoop_version }}.tgz" dest=/opt/
+
+- name: create link to Hadoop directory
+  sudo: yes
+  file: src=/opt/hadoop-{{ hadoop_version }} dest={{ hadoop_root }} state=link
+
+- name: config Hadoop env
+  sudo: yes
+  template: src=conf/hadoop-env.sh.j2 dest={{ hadoop_root }}/etc/hadoop/hadoop-env.sh mode="u=rwx,g=rx,o=rx"
+  tags: config_hadoop
+
+- name: config Hadoop core-site.xml
+  sudo: yes
+  template: src=conf/core-site.xml.j2 dest="{{ hadoop_root }}/etc/hadoop/core-site.xml" owner=root group=root
+
+- name: config Hadoop master
+  sudo: yes
+  template: src=conf/masters.j2 dest="{{ hadoop_root }}/etc/hadoop/masters" owner=root group=root
+
+- name: config Hadoop slaves
+  sudo: yes
+  template: src=conf/slaves.j2 dest="{{ hadoop_root }}/etc/hadoop/slaves" owner=root group=root
+
+- name: attempt to stop Hadoop cluster
+  sudo: yes
+  shell: "{{ hadoop_root }}/sbin/stop-dfs.sh"
+  tags: run
+  when: "hadoop_type_of_node == 'master'"
+
+- name: attempt to start Hadoop cluster
+  sudo: yes
+  shell: "{{ hadoop_root }}/sbin/start-dfs.sh"
+  tags: run
+  when: "hadoop_type_of_node == 'master'"
