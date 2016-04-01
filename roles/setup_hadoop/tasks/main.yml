@@ -12,14 +12,14 @@
   sudo: yes
   file: src=/opt/hadoop-{{ hadoop_version }} dest={{ hadoop_root }} state=link
 
-- name: add {{hadoop_root}} to path
+- name: add {{hadoop_root}}/bin to path
   sudo: yes
   lineinfile: >
   dest=/etc/environment
   state=present
   backrefs=yes
-  regexp='PATH=(["]*)((?!.*?{{ hadoop_root }}).*?)(["]*)$'
-  line="PATH=\1\2:{{ hadoop_root }}\3"
+  regexp='PATH=(["]*)((?!.*?{{ hadoop_root }}/bin).*?)(["]*)$'
+  line="PATH=\1\2:{{ hadoop_root }}/bin\3"
 
 - name: config Hadoop env
   sudo: yes
