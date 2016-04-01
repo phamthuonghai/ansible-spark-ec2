@@ -3,7 +3,6 @@
   roles:
   - create_spark_cluster
 
-
 - name: Install spark
   hosts: tag_ds_tech_spark
   roles:
