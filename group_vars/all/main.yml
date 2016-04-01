@@ -2,6 +2,8 @@
 region: us-west-2
 instance_type: m4.large
 slave_count: 2
+ec2_key_pair: dsteam
+
 boto_profile: DSPlatform
 remote_user: ubuntu
 
