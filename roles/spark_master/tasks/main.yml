@@ -19,12 +19,12 @@
   local_action: file  path=/tmp/id_rsa.tmp state=absent
 
 - name: write SPARK_PUBLIC_DNS on master
-  local_action: shell echo 'export SPARK_PUBLIC_DNS="{{ item.public_dns_name }}"' | ssh ubuntu@{{ item.public_ip }} "sudo su -c 'cat >> {{ spark_root }}/conf/spark-env.sh'"
+  local_action: shell echo 'export SPARK_PUBLIC_DNS="{{ item.public_ip }}"' | ssh ubuntu@{{ item.public_ip }} "sudo su -c 'cat >> {{ spark_root }}/conf/spark-env.sh'"
   with_items: "{{ hostvars.localhost.spark_master.tagged_instances }}"
   tags: config_spark
 
 - name: write SPARK_PUBLIC_DNS on slaves
-  local_action: shell echo 'export SPARK_PUBLIC_DNS="{{ item.public_dns_name }}"' | ssh ubuntu@{{ item.public_ip }} "sudo su -c 'cat >> {{ spark_root }}/conf/spark-env.sh'"
+  local_action: shell echo 'export SPARK_PUBLIC_DNS="{{ item.public_ip }}"' | ssh ubuntu@{{ item.public_ip }} "sudo su -c 'cat >> {{ spark_root }}/conf/spark-env.sh'"
   with_items: "{{ hostvars.localhost.spark_slave.tagged_instances }}"
   tags: config_spark
 
