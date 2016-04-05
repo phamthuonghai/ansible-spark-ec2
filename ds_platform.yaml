@@ -15,12 +15,12 @@
   - common_standalone
   - spark_master
 
-- name: Install Hadoop master
-  hosts: tag_ds_role_spark_master
-  roles:
-  - { role: setup_hadoop, hadoop_type_of_node: master, tags: hadoop}
-
 - name: Install Hadoop slaves
   hosts: tag_ds_role_spark_slave
   roles:
   - { role: setup_hadoop, hadoop_type_of_node: slave, tags: hadoop}
+
+- name: Install Hadoop master
+  hosts: tag_ds_role_spark_master
+  roles:
+  - { role: setup_hadoop, hadoop_type_of_node: master, tags: hadoop}

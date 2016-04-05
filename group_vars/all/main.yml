@@ -4,6 +4,8 @@ instance_type: m4.large
 slave_count: 2
 ec2_key_pair: dsteam
 
+ec2_volume_size: 100
+
 boto_profile: DSPlatform
 remote_user: ubuntu
 
