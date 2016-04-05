@@ -38,6 +38,11 @@
   sudo: yes
   template: src=conf/slaves.j2 dest="{{ hadoop_root }}/etc/hadoop/slaves" owner=root group=root
 
+- name: format Hadoop namenode
+  sudo: yes
+  command: "{{ hadoop_root }}/bin/hadoop namenode -format creates=/tmp/hadoop-root/dfs/name"
+  when: "hadoop_type_of_node == 'master'"
+
 - name: attempt to stop Hadoop cluster
   sudo: yes
   shell: "{{ hadoop_root }}/sbin/stop-dfs.sh"
