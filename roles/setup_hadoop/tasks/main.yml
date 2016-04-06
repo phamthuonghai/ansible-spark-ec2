@@ -41,6 +41,7 @@
 - name: format Hadoop namenode
   sudo: yes
   command: "{{ hadoop_root }}/bin/hadoop namenode -format creates=/tmp/hadoop-root/dfs/name"
+  tags: run
   when: "hadoop_type_of_node == 'master'"
 
 - name: attempt to stop Hadoop cluster
