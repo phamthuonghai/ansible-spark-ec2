@@ -1,7 +1,7 @@
 ---
 region: us-west-2
 instance_type: m4.large
-slave_count: 2
+slave_count: 1
 ec2_key_pair: dsteam
 
 ec2_volume_size: 100
