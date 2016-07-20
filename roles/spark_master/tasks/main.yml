@@ -28,6 +28,20 @@
   with_items: "{{ hostvars.localhost.spark_slave.tagged_instances }}"
   tags: config_spark
 
+- name: add all slaves to known_host
+  sudo: yes
+  shell: ssh-keyscan -H {{ item.private_ip }} >> ~/.ssh/known_hosts
+  with_items: "{{ hostvars.localhost.spark_slave.tagged_instances }}"
+
+- name: add itself to known_host
+  sudo: yes
+  shell: ssh-keyscan -H {{ item.private_dns_name }} >> ~/.ssh/known_hosts
+  with_items: "{{ hostvars.localhost.spark_master.tagged_instances }}"
+
+- name: add 0.0.0.0 (secondary namenode) to known_host
+  sudo: yes
+  shell: ssh-keyscan -H 0.0.0.0 >> ~/.ssh/known_hosts
+
 - name: populate conf/slaves file
   sudo: yes
   template: src=conf/slaves.j2 dest={{ spark_root }}/conf/slaves
