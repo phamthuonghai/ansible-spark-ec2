@@ -1,0 +1,31 @@
+---
+# tasks file for hbase
+- name: download Hbase pre-built package
+  sudo: yes
+  get_url: url={{ hbase_download_url }} dest="/tmp/hbase-{{ hbase_version }}.tgz"
+
+- name: extract Hbase archive
+  sudo: yes
+  unarchive: copy=no src="/tmp/hbase-{{ hbase_version }}.tgz" dest=/opt/
+
+- name: create link to Hbase directory
+  sudo: yes
+  file: src=/opt/hbase-{{ hbase_version }} dest={{ hbase_root }} state=link
+
+- name: config Hbase env
+  sudo: yes
+  template: src=conf/hbase-env.sh.j2 dest={{ hbase_root }}/conf/hbase-env.sh mode="u=rwx,g=rx,o=rx"
+
+- name: config Hbase hbase-site.xml
+  sudo: yes
+  template: src=conf/hbase-site.xml.j2 dest="{{ hbase_root }}/conf/hbase-site.xml" owner=root group=root
+
+- name: config Hbase regionservers
+  sudo: yes
+  template: src=conf/regionservers.j2 dest="{{ hadoop_root }}/conf/regionservers" owner=root group=root
+
+- name: attempt to start Hbasse cluster
+  sudo: yes
+  shell: "{{ hbase }}/bin/start-hbase.sh"
+  tags: run
+  when: "hadoop_type_of_node == 'master'"

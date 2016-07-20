@@ -1,7 +1,7 @@
 ---
 region: us-west-2
 instance_type: m4.large
-slave_count: 2
+slave_count: 1
 ec2_key_pair: dsteam
 
 ec2_volume_size: 100
@@ -18,3 +18,8 @@ spark_root: /opt/spark
 hadoop_download_url: http://www-us.apache.org/dist/hadoop/common/hadoop-2.6.4/hadoop-2.6.4.tar.gz
 hadoop_version: 2.6.4
 hadoop_root: /opt/hadoop
+
+hbase_download_url: http://www-us.apache.org/dist/hbase/stable/hbase-1.2.2-bin.tar.gz
+hbase_version: 1.2.2
+hbase_root: /opt/hbase
+

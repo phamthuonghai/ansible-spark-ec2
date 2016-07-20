@@ -18,9 +18,19 @@
 - name: Install Hadoop slaves
   hosts: tag_ds_role_spark_slave
   roles:
-  - { role: setup_hadoop, hadoop_type_of_node: slave, tags: hadoop}
+  - { role: setup_hadoop, hadoop_type_of_node: slave}
 
 - name: Install Hadoop master
   hosts: tag_ds_role_spark_master
   roles:
-  - { role: setup_hadoop, hadoop_type_of_node: master, tags: hadoop}
+  - { role: setup_hadoop, hadoop_type_of_node: master}
+
+- name: Install Hbase slave
+  hosts: tag_ds_role_spark_slave
+  roles:
+  - { role: hbase, hbase_type_of_node: slave}
+
+- name: Install Hbase Master
+  hosts: tag_ds_role_spark_master
+  roles:
+  - { role: hbase, hbase_type_of_node: master}

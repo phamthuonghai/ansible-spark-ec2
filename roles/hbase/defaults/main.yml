@@ -1,0 +1,5 @@
+---
+# defaults file for hbase
+hbase_download_url: http://www-us.apache.org/dist/hbase/stable/hbase-1.2.2-bin.tar.gz
+hbase_version: 1.2.2
+hbase_root: /opt/hbase
