@@ -22,10 +22,10 @@
 
 - name: config Hbase regionservers
   sudo: yes
-  template: src=conf/regionservers.j2 dest="{{ hadoop_root }}/conf/regionservers" owner=root group=root
+  template: src=conf/regionservers.j2 dest="{{ hbase_root }}/conf/regionservers" owner=root group=root
 
 - name: attempt to start Hbasse cluster
   sudo: yes
-  shell: "{{ hbase }}/bin/start-hbase.sh"
+  shell: "{{ hbase_root }}/bin/start-hbase.sh"
   tags: run
-  when: "hadoop_type_of_node == 'master'"
+  when: "hbase_type_of_node == 'master'"
